@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+}
+
+group 'io.copymaker'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation('org.junit.jupiter:junit-jupiter:5.5.2')
+    testImplementation('org.assertj:assertj-core:3.13.2')
+}
+
+test {
+    // Use junit platform for unit tests
+    useJUnitPlatform()
+}
