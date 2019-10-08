@@ -1,55 +1,61 @@
 package io.copymaker.racing.track;
 
 import io.copymaker.racing.car.Car;
+import io.copymaker.racing.leaderboard.LeaderBoard;
+import io.copymaker.racing.leaderboard.Record;
+import io.copymaker.racing.number.NumberGenerator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.Map;
 
 public class Track {
 
-    private final int lapCount;
+    private final int laps;
+    private final LeaderBoard leaderBoard = new LeaderBoard();
+
     private List<Car> cars = new ArrayList<>();
-    private Supplier<Integer> supplier;
 
-    public Track(int lapCount) {
-        this.lapCount = lapCount;
+    public Track(int laps) {
+        this.laps = laps;
     }
 
-    public void startRace() {
-        for (int i = 0; i < lapCount; i++) {
-            forwardCars();
+    public void startRace(NumberGenerator numberGenerator) {
+        for (int i = 0; i < laps; i++) {
+            Record totalRecord = racingCars(numberGenerator);
+
+            // TODO: console 출력
+            System.out.println("totalRecord: " + totalRecord);
+            System.out.println("----------");
         }
+
+        List<Car> winningCars = leaderBoard.findWinningCars();
+
+        // TODO: console 출력
+        System.out.println("우승 자동차: " + winningCars);
     }
 
-    public void forwardCars() {
-        cars.stream().forEach(car -> car.forward(supplier.get()));
-    }
-
-    public List<Car> finishLine() {
-        List<Car> winningCars = new ArrayList<>();
-
-        cars.sort((a, b) -> Integer.compare(b.getDistance(), a.getDistance()));
+    public Record racingCars(NumberGenerator numberGenerator) {
+        Map<Car, Integer> map = new HashMap<>();
         for (Car car : cars) {
-            if (car.getDistance() == cars.get(0).getDistance()) {
-                winningCars.add(car);
-                continue;
-            }
-            break;
+            map.put(car, car.forward(numberGenerator.generate()));
         }
+        leaderBoard.addRecord(map);
 
-        return winningCars;
+        return leaderBoard.getTotalRecord();
     }
 
     public void addCar(Car car) {
         cars.add(car);
     }
 
-    public List<Car> getCars() {
-        return cars;
+    public void setCars(List<Car> cars) {
+        this.cars = cars;
     }
 
-    public void setSupplier(Supplier<Integer> supplier) {
-        this.supplier = supplier;
+    public List<Car> getCars() {
+        return new ArrayList<>(cars);
     }
+
 }

@@ -1,15 +1,13 @@
 package io.copymaker.racing.car;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.assertj.core.api.Assertions.*;
 
 class CarTest {
 
@@ -39,39 +37,25 @@ class CarTest {
         });
     }
 
-    @Test
-    @DisplayName("자동차의 초기 이동 거리는 0이다.")
-    void shouldReturnZeroWhenCreatedCarsDistance() {
-        assertThat(car.getDistance()).isEqualTo(0);
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1, 2, 3})
+    @DisplayName("자동차의 이동 요청 거리가 임계값 미만일 경우 0을 반환한다.")
+    void shouldReturnZeroWhenForwardWithLessThanThresholdFactorTest(int distance) {
+        assertThat(car.forward(distance)).isEqualTo(0);
     }
 
-    @Test
-    @DisplayName("자동차는 주어진 숫자만큼 이동해야 한다.")
-    void shouldCarMoveWhenForwardWithIntegerValue() {
-        car.forward(1);
-        assertThat(car.getDistance()).isEqualTo(1);
-
-        car.forward(2);
-        assertThat(car.getDistance()).isEqualTo(3);
-
-        car.forward(3);
-        assertThat(car.getDistance()).isEqualTo(6);
+    @ParameterizedTest
+    @ValueSource(ints = {4, 5, 10, 50, 100})
+    @DisplayName("자동차의 이동 요청 거리가 임계값 이상일 경우 요청 거리를 반환한다.")
+    void shouldReturnDistanceWhenForwardWithGreaterThanOrEqualThresholdFactorTest(int distance) {
+        assertThat(car.forward(distance)).isEqualTo(distance);
     }
 
     @ParameterizedTest
     @ValueSource(ints = {200, Integer.MAX_VALUE})
-    @DisplayName("자동차 이동거리는 0~100 사이의 값이어야 한다.")
+    @DisplayName("자동차의 이동 요청 거리가 0~100 이외의 값이면 0 을 반환한다.")
     void shouldThrownExceptionWhenForwardWithHugeValue(int distance) {
-        assertThrows(IllegalArgumentException.class, () -> {
-            car.forward(distance);
-        });
-    }
-
-    @Disabled
-    @Test
-    @DisplayName("자동차의 최대 이동거리는 트랙의 길이와 같다.")
-    void shouldWriteTest() {
-
+        assertThat(car.forward(distance)).isEqualTo(0);
     }
 
 }
