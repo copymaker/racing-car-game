@@ -8,17 +8,21 @@ import java.util.function.Supplier;
 
 public class Track {
 
+    private final int lapCount;
     private List<Car> cars = new ArrayList<>();
+    private Supplier<Integer> supplier;
 
-    public void addCar(Car car) {
-        this.cars.add(car);
+    public Track(int lapCount) {
+        this.lapCount = lapCount;
     }
 
-    public List<Car> getCars() {
-        return cars;
+    public void startRace() {
+        for (int i = 0; i < lapCount; i++) {
+            forwardCars();
+        }
     }
 
-    public void forwardCars(Supplier<Integer> supplier) {
+    public void forwardCars() {
         cars.stream().forEach(car -> car.forward(supplier.get()));
     }
 
@@ -35,5 +39,17 @@ public class Track {
         }
 
         return winningCars;
+    }
+
+    public void addCar(Car car) {
+        cars.add(car);
+    }
+
+    public List<Car> getCars() {
+        return cars;
+    }
+
+    public void setSupplier(Supplier<Integer> supplier) {
+        this.supplier = supplier;
     }
 }
