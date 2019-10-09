@@ -25,7 +25,7 @@ class StrUtilTest {
     @ParameterizedTest
     @MethodSource("provideRepeatNegativeFixtures")
     void repeatNegativeTest(String str, int count) {
-        System.out.println( StrUtil.repeat(str, 0) );
+        assertThat(StrUtil.repeat(str, count)).isEqualTo("");
     }
 
     private static Stream<Arguments> provideRepeatNegativeFixtures() {
