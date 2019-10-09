@@ -2,7 +2,7 @@ package io.copymaker.racing.car;
 
 import java.util.Objects;
 
-public class Car {
+public class Car implements Comparable<Car> {
 
     private final int THRESHOLD_FACTOR = 4;
 
@@ -44,9 +44,12 @@ public class Car {
     }
 
     @Override
+    public int compareTo(Car other) {
+        return this.name.compareTo(other.name);
+    }
+
+    @Override
     public String toString() {
-        return "Car{" +
-                "name='" + name + '\'' +
-                '}';
+        return name;
     }
 }
