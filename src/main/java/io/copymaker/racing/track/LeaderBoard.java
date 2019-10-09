@@ -1,4 +1,4 @@
-package io.copymaker.racing.leaderboard;
+package io.copymaker.racing.track;
 
 import io.copymaker.racing.car.Car;
 
@@ -11,7 +11,7 @@ public class LeaderBoard {
     private final List<Record> records = new ArrayList<>();
     private Record totalRecord = Record.EMPTY_RECORD;
 
-    public void addRecord(Map<Car, Integer> map) {
+    void addRecord(Map<Car, Integer> map) {
         Record record = Record.from(map);
         records.add(record);
         totalRecord = totalRecord.merge(record);
@@ -19,10 +19,6 @@ public class LeaderBoard {
 
     public List<Car> findWinningCars() {
         return totalRecord.findLongestDistanceCars();
-    }
-
-    public List<Record> getRecords() {
-        return new ArrayList<>(records);
     }
 
     public Record getTotalRecord() {

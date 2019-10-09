@@ -1,25 +1,17 @@
-package io.copymaker.racing.view;
+package io.copymaker.racing;
 
-public class DebugView implements View {
+import java.util.Scanner;
 
-    private final String names;
-    private final int laps;
-
-    public DebugView(String names, int laps) {
-        this.names = names;
-        this.laps = laps;
-    }
+public class ConsoleView {
 
     public String inputCarNames() {
         System.out.print("자동차 이름을 입력해주세요: ");
-        System.out.println(names);
-        return names;
+        return new Scanner(System.in).nextLine();
     }
 
     public int inputTotalLaps() {
         System.out.print("이동할 횟수를 입력해주세요: ");
-        System.out.println(laps);
-        return laps;
+        return new Scanner(System.in).nextInt();
     }
 
     public void printMessage(String message) {
@@ -29,4 +21,9 @@ public class DebugView implements View {
     public void printErrorMessage(String message) {
         System.err.println(message);
     }
+
+    public void printBreakLine() {
+        System.out.println("=====================================");
+    }
+
 }

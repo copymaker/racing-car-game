@@ -1,23 +1,23 @@
 package io.copymaker.racing.track;
 
 import io.copymaker.racing.car.Car;
-import io.copymaker.racing.number.IncrementNumberGenerator;
 import io.copymaker.racing.number.NumberGenerator;
-import io.copymaker.racing.number.RandomNumberGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.*;
 
 class TrackTest {
 
-    private final int LAP_COUNT = 5;
     private Track track;
     private Car car1, car2, car3, car4;
-    private NumberGenerator randomGenerator;
-    private NumberGenerator incrementGenerator;
 
     @BeforeEach
     void setUp() {
@@ -26,14 +26,9 @@ class TrackTest {
         car3 = new Car("car3");
         car4 = new Car("car4");
 
-        track = new Track(LAP_COUNT);
-        track.addCar(car1);
-        track.addCar(car2);
-        track.addCar(car3);
-        track.addCar(car4);
-
-        randomGenerator = new RandomNumberGenerator();
-        incrementGenerator = new IncrementNumberGenerator();
+        track = new Track();
+        track.setCars(Arrays.asList(car1, car2, car3, car4));
+        track.setNumberGenerator(getConstantNumberGenerator());
     }
 
     @Test
@@ -45,20 +40,46 @@ class TrackTest {
     @Test
     @DisplayName("트랙은 각각의 자동차들을 각각의 이동거리만큼 전진 시킬 수 있다.")
     void shouldEachCarsForwardWhenTrackCallForwardsCarsTest() {
-        track.racingCars(incrementGenerator);
+        Map<Car, Integer> map = new HashMap<>();
+        map.put(car1, 4);
+        map.put(car2, 5);
+        map.put(car3, 6);
+        map.put(car4, 7);
+        Record expectRecord = Record.from(map);
 
-        assertThat(track.getCars()).extracting("distance").containsOnly(1, 2, 3, 4);
+        assertThat(track.racingCars()).isEqualTo(expectRecord);
     }
 
     @Test
-    @DisplayName("랩 수 만큼 자동차를 전진 또는 정지 시킨다.")
-    void shouldRepeatForwardCarsUntilTracksLapCount() {
-        int distance = 5;
-        int finalDistance = distance * LAP_COUNT;
-        track.startRace(incrementGenerator);
+    @DisplayName("트랙에 자동차가 없거나, 숫자 발생기가 없으면 예외를 던진다.")
+    void shouldThrownExceptionWhenCheckReadyIsFailTest() {
+        assertThrows(IllegalStateException.class, () -> {
+            track.setCars(null);
+            track.checkReady();
+        });
 
-        assertThat(track.getCars()).extracting("distance")
-                .containsExactly(finalDistance, finalDistance, finalDistance, finalDistance);
+        assertThrows(IllegalStateException.class, () -> {
+            track.setCars(new ArrayList<>());
+            track.checkReady();
+        });
+
+        assertThrows(IllegalStateException.class, () -> {
+            track.setNumberGenerator(null);
+            track.checkReady();
+        });
+    }
+
+    private NumberGenerator getConstantNumberGenerator() {
+        return new NumberGenerator() {
+
+            private int[] numbers = {4, 5, 6, 7};
+            private int i = 0;
+
+            @Override
+            public int generate() {
+                return numbers[i++ % 4];
+            }
+        };
     }
 
 }

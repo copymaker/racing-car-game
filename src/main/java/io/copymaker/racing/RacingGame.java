@@ -1,10 +1,10 @@
 package io.copymaker.racing;
 
 import io.copymaker.racing.car.Car;
+import io.copymaker.racing.track.Record;
 import io.copymaker.racing.number.NumberGenerator;
 import io.copymaker.racing.number.RandomNumberGenerator;
 import io.copymaker.racing.track.Track;
-import io.copymaker.racing.view.View;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,38 +13,62 @@ import java.util.stream.Stream;
 public class RacingGame {
 
     private Track track;
-    private NumberGenerator numberGenerator;
-    private View view;
+    private int laps;
 
-    public RacingGame(View view) {
-        this.view = view;
-    }
+    private ConsoleView view = new ConsoleView();
 
     public void start() {
-        String[] names = splitWithDelimiter(view.inputCarNames(), ",");
-        int laps = view.inputTotalLaps();
-
-        startGame(names, laps);
+        readyGame();
+        startGame();
     }
 
-    // TODO: view 와 track 을 분리할 방법
-    private void startGame(String[] names, int laps) {
-        readyGame(names, laps);
-        track.startRace(numberGenerator);
+    private void readyGame() {
+        boolean isReadyTrack = false;
+        boolean isReadyLaps = false;
+
+        do {
+            isReadyTrack = readyTrack();
+        } while (!isReadyTrack);
+
+        do {
+            isReadyLaps = readyLaps();
+        } while (!isReadyLaps);
     }
 
-    private void readyGame(String[] names, int laps) {
-        setTrack(new Track(laps));
-        setCars(createCars(names));
-        setNumberGenerator(new RandomNumberGenerator());
+    private boolean readyTrack() {
+        try {
+            setTrack(createNewTrack(view.inputCarNames(), new RandomNumberGenerator()));
+            return true;
+        } catch (Exception e) {
+            view.printErrorMessage(e.getMessage());
+            return false;
+        }
     }
 
-    private void setTrack(Track track) {
-        this.track = track;
+    private boolean readyLaps() {
+        try {
+            setLaps(view.inputTotalLaps());
+            return true;
+        } catch (Exception e) {
+            view.printErrorMessage(e.getMessage());
+            return false;
+        }
     }
 
-    private void setCars(List<Car> cars) {
-        track.setCars(cars);
+    private void startGame() {
+        for (int i = 0; i < laps; i++) {
+            Record record = track.racingCars();
+            view.printBreakLine();
+            view.printMessage(record.toString());
+        }
+        view.printMessage("우승 자동차는 " + track.getWinners() + " 입니다.");
+    }
+
+    private Track createNewTrack(String stringNames, NumberGenerator numberGenerator) {
+        Track track = new Track();
+        track.setCars(createCars(stringNames.split(",")));
+        track.setNumberGenerator(numberGenerator);
+        return track;
     }
 
     private List<Car> createCars(String[] names) {
@@ -53,12 +77,19 @@ public class RacingGame {
                     .collect(Collectors.toList());
     }
 
-    public void setNumberGenerator(NumberGenerator numberGenerator) {
-        this.numberGenerator = numberGenerator;
+    private void setTrack(Track track) {
+        if (track == null) {
+            throw new IllegalArgumentException("Track 은 반드시 필요합니다.");
+        }
+        track.checkReady();
+        this.track = track;
     }
 
-    // TODO: util 후보
-    private String[] splitWithDelimiter(String str, String delimiter) {
-        return str.split(delimiter);
+    private void setLaps(int laps) {
+        if (laps < 1 || laps > 10) {
+            throw new IllegalArgumentException("반복 횟수는 1 ~ 10 사이여야 합니다.");
+        }
+        this.laps = laps;
     }
+
 }

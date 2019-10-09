@@ -1,8 +1,6 @@
 package io.copymaker.racing.track;
 
 import io.copymaker.racing.car.Car;
-import io.copymaker.racing.leaderboard.LeaderBoard;
-import io.copymaker.racing.leaderboard.Record;
 import io.copymaker.racing.number.NumberGenerator;
 
 import java.util.ArrayList;
@@ -12,31 +10,15 @@ import java.util.Map;
 
 public class Track {
 
-    private final int laps;
     private final LeaderBoard leaderBoard = new LeaderBoard();
-
     private List<Car> cars = new ArrayList<>();
+    private NumberGenerator numberGenerator;
 
-    public Track(int laps) {
-        this.laps = laps;
+    public void setNumberGenerator(NumberGenerator numberGenerator) {
+        this.numberGenerator = numberGenerator;
     }
 
-    public void startRace(NumberGenerator numberGenerator) {
-        for (int i = 0; i < laps; i++) {
-            Record totalRecord = racingCars(numberGenerator);
-
-            // TODO: console 출력
-            System.out.println("totalRecord: " + totalRecord);
-            System.out.println("----------");
-        }
-
-        List<Car> winningCars = leaderBoard.findWinningCars();
-
-        // TODO: console 출력
-        System.out.println("우승 자동차: " + winningCars);
-    }
-
-    public Record racingCars(NumberGenerator numberGenerator) {
+    public Record racingCars() {
         Map<Car, Integer> map = new HashMap<>();
         for (Car car : cars) {
             map.put(car, car.forward(numberGenerator.generate()));
@@ -44,6 +26,10 @@ public class Track {
         leaderBoard.addRecord(map);
 
         return leaderBoard.getTotalRecord();
+    }
+
+    public List<Car> getWinners() {
+        return leaderBoard.findWinningCars();
     }
 
     public void addCar(Car car) {
@@ -58,4 +44,12 @@ public class Track {
         return new ArrayList<>(cars);
     }
 
+    public void checkReady() {
+        if (cars == null || cars.isEmpty()) {
+            throw new IllegalStateException("자동차는 1대 이상 필요합니다.");
+        }
+        if (numberGenerator == null) {
+            throw new IllegalStateException("숫자 발생기는 반드시 필요합니다.");
+        }
+    }
 }

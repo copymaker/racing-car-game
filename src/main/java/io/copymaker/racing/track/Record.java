@@ -1,11 +1,9 @@
-package io.copymaker.racing.leaderboard;
+package io.copymaker.racing.track;
 
 import io.copymaker.racing.car.Car;
+import io.copymaker.racing.util.StrUtil;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -40,9 +38,31 @@ public class Record {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Record record = (Record) o;
+        return Objects.equals(map, record.map);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(map);
+    }
+
+    @Override
     public String toString() {
-        return "Record{" +
-                "map=" + map +
-                '}';
+        StringBuilder sb = new StringBuilder();
+        map.keySet().stream()
+                .sorted()
+                .forEach(car -> {
+                    int distance = map.get(car);
+                    sb.append(StrUtil.repeat("-", distance));
+                    sb.append(car.getName());
+                    sb.append("("+ distance + ")");
+                    sb.append("\n");
+                });
+
+        return sb.toString();
     }
 }
